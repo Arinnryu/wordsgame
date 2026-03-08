@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語消し消し楽</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffb6c1 0%, #b6e3ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(255, 105, 180, 0.3);
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #ff8eb4;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-title {
+            font-size: 4rem;
+            color: #ff6bb5;
+            text-shadow: 3px 3px 0 #ffd1eb, 6px 6px 0 rgba(255, 107, 181, 0.3);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            text-align: center;
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .game-title:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 214, 235, 0.3);
+        }
+        
+        .game-title:focus {
+            background-color: rgba(255, 214, 235, 0.5);
+            box-shadow: 0 0 0 4px rgba(255, 107, 181, 0.5);
+        }
+        
+        .timer {
+            font-size: 2rem;
+            color: #5d9bff;
+            background-color: #e6f0ff;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(93, 155, 255, 0.2);
+            margin-bottom: 30px;
+            font-weight: bold;
+            border: 5px solid #a8d0ff;
+        }
+        
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 35px;
+            background-color: #fff5fa;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.2);
+            position: relative;
+            z-index: 1;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            min-width: 280px;
+        }
+        
+        .menu-title {
+            font-size: 1.5rem;
+            color: #ff85a2;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .slider-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .slider-value {
+            font-size: 2rem;
+            color: #ff6bb5;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background-color: #ffe6f0;
+            padding: 8px 20px;
+            border-radius: 30px;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 30px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #ffb6e1, #ff6bb5);
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #ff4da6;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255, 77, 166, 0.5);
+            border: 5px solid white;
+            transition: all 0.2s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: #ff3385;
+        }
+        
+        .btn {
+            padding: 18px 35px;
+            font-size: 1.5rem;
+            background: linear-gradient(to bottom, #5d9bff, #3a7dff);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(93, 155, 255, 0.4);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(93, 155, 255, 0.5);
+            background: linear-gradient(to bottom, #6aa3ff, #4a8aff);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-icon {
+            font-size: 1.8rem;
+        }
+        
+        .words-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .word-card {
+            background: linear-gradient(145deg, #ffffff, #f0f9ff);
+            border-radius: 25px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 25px rgba(93, 155, 255, 0.15);
+            transition: all 0.3s ease;
+            border: 5px solid #a8d0ff;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+        }
+        
+        .word-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 35px rgba(93, 155, 255, 0.25);
+        }
+        
+        .word-card.matched {
+            background: linear-gradient(145deg, #d4ffd4, #a8ffa8);
+            border-color: #7aff7a;
+            animation: matchAnimation 0.5s ease;
+        }
+        
+        @keyframes matchAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .word {
+            font-size: 2.2rem;
+            color: #ff6bb5;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            word-break: keep-all;
+            line-height: 1.4;
+        }
+        
+        .japanese-word {
+            font-size: 2.5rem;
+            color: #ff3385;
+        }
+        
+        .answer {
+            font-size: 1.6rem;
+            color: #5d9bff;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: #f0f7ff;
+            border-radius: 15px;
+            width: 100%;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            background-color: #fff0f7;
+            padding: 25px;
+            border-radius: 25px;
+            margin-top: 35px;
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .instructions h3 {
+            color: #ff6bb5;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .instructions p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .instructions li {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 8px;
+            margin-left: 20px;
+        }
+        
+        .game-status {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #ff6bb5;
+            margin-bottom: 25px;
+            font-weight: bold;
+            min-height: 40px;
+            padding: 15px;
+            background-color: #fff0f7;
+            border-radius: 20px;
+        }
+        
+        .decoration {
+            position: absolute;
+            z-index: 0;
+        }
+        
+        .decoration-1 {
+            top: 40px;
+            right: 40px;
+            width: 120px;
+            height: 120px;
+            background-color: #ffccf2;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .decoration-2 {
+            bottom: 50px;
+            left: 50px;
+            width: 100px;
+            height: 100px;
+            background-color: #ccf2ff;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .decoration-3 {
+            top: 60%;
+            left: 5%;
+            width: 80px;
+            height: 80px;
+            background-color: #ffd9eb;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        .decoration-4 {
+            bottom: 30%;
+            right: 8%;
+            width: 70px;
+            height: 70px;
+            background-color: #d9fffc;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 18px 35px;
+            font-size: 1.5rem;
+            background: linear-gradient(to bottom, #ff85a2, #ff6bb5);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(255, 107, 181, 0.4);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .file-label:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 107, 181, 0.5);
+            background: linear-gradient(to bottom, #ff99b8, #ff80b3);
+        }
+        
+        .import-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .word-count {
+            font-size: 1.2rem;
+            color: #888;
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .language-hint {
+            font-size: 1rem;
+            color: #5d9bff;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .card-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1rem;
+            color: #aaa;
+            background-color: #f5f5f5;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .japanese-hint {
+            font-size: 1rem;
+            color: #ff6bb5;
+            background-color: #fff0f7;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .encoding-selector {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .encoding-label {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .encoding-select {
+            padding: 8px 15px;
+            border-radius: 10px;
+            border: 2px solid #a8d0ff;
+            background-color: white;
+            font-size: 1rem;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .game-title {
+                font-size: 2.8rem;
+            }
+            
+            .menu {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .words-panel {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .word {
+                font-size: 1.8rem;
+            }
+            
+            .japanese-word {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="decoration decoration-1"></div>
+        <div class="decoration decoration-2"></div>
+        <div class="decoration decoration-3"></div>
+        <div class="decoration decoration-4"></div>
+        
+        <div class="header">
+            <h1 class="game-title" contenteditable="true">単語消し消し楽</h1>
+            <div class="timer">経過時間：<span id="time">0</span>秒</div>
+        </div>
+        
+        <div class="game-status" id="game-status">単語消し消し楽へようこそ！単語リストをインポートしてゲームを始めましょう。</div>
+        
+        <div class="menu">
+            <div class="menu-item">
+                <div class="menu-title">単語ペア数を調整</div>
+                <div class="slider-container">
+                    <div class="slider-value" id="slider-value">10 ペア</div>
+                    <input type="range" min="5" max="50" value="10" class="slider" id="word-slider">
+                </div>
+            </div>
+            
+            <div class="menu-item import-container">
+                <div class="menu-title">単語リストをインポート</div>
+                <label for="word-file" class="file-label">
+                    <span class="btn-icon">📂</span> Excel/CSVファイルを選択
+                </label>
+                <input type="file" id="word-file" class="file-input" accept=".csv,.xlsx,.xls,.txt">
+                <div class="encoding-selector">
+                    <div class="encoding-label">ファイルの文字エンコーディング:</div>
+                    <select id="encoding-select" class="encoding-select">
+                        <option value="auto">自動検出</option>
+                        <option value="utf-8">UTF-8</option>
+                        <option value="shift_jis">Shift_JIS (日本語)</option>
+                        <option value="euc-jp">EUC-JP (日本語)</option>
+                        <option value="gbk">GBK (簡体中文)</option>
+                        <option value="big5">Big5 (繁體中文)</option>
+                        <option value="windows-1252">Windows-1252 (西ヨーロッパ言語)</option>
+                    </select>
+                </div>
+                <div class="word-count" id="word-count">単語リストがインポートされていません</div>
+                <div class="language-hint">ファイル形式：第1列は日本語単語、第2列は対応する答え</div>
+            </div>
+        </div>
+        
+        <div class="japanese-hint">日本語の単語と答えをマッチさせてください！</div>
+        
+        <div class="words-panel" id="words-panel">
+            <!-- 単語カードはここに動的に生成されます -->
+        </div>
+        
+        <div class="instructions">
+            <h3>遊び方</h3>
+            <ol>
+                <li>タイトルをクリックしてゲームタイトルを変更できます</li>
+                <li>スライダーで単語ペア数（5〜50ペア）を調整します</li>
+                <li>「Excel/CSVファイルを選択」をクリックして単語リストをインポートします（ファイル形式：第1列は日本語単語、第2列は対応する答え）</li>
+                <li>文字化けする場合は、ファイルの文字エンコーディングを選択してください</li>
+                <li>単語リストをインポートすると、単語カードが表示されます。日本語単語と対応する答えをマッチさせてください</li>
+                <li>カードをクリックしてマッチさせます。正しくマッチするとカードが消えます</li>
+                <li>すべてのペアをマッチさせるとゲームクリアです</li>
+                <li>このゲームはオフラインで動作します</li>
+            </ol>
+            <p style="margin-top: 15px; color: #ff6bb5; font-weight: bold;">※ 単語リストをインポートしない場合は、デフォルトの日本語単語リストが使用されます。</p>
+        </div>
+    </div>
+
+    <script>
+        // ゲーム状態変数
+        let wordList = [];
+        let currentWords = [];
+        let matchedPairs = 0;
+        let totalPairs = 0;
+        let selectedCard = null;
+        let gameStarted = false;
+        let gameTimer = null;
+        let seconds = 0;
+        
+        // DOM要素
+        const timeDisplay = document.getElementById('time');
+        const wordSlider = document.getElementById('word-slider');
+        const sliderValue = document.getElementById('slider-value');
+        const wordsPanel = document.getElementById('words-panel');
+        const wordFileInput = document.getElementById('word-file');
+        const wordCountDisplay = document.getElementById('word-count');
+        const gameStatus = document.getElementById('game-status');
+        const encodingSelect = document.getElementById('encoding-select');
+        
+        // デフォルトの日本語単語リスト
+        const defaultJapaneseWords = [
+            { word: "ありがとう", answer: "感谢" },
+            { word: "こんにちは", answer: "你好" },
+            { word: "さようなら", answer: "再见" },
+            { word: "おはよう", answer: "早上好" },
+            { word: "こんばんは", answer: "晚上好" },
+            { word: "すみません", answer: "对不起" },
+            { word: "お願いします", answer: "请" },
+            { word: "はい", answer: "是" },
+            { word: "いいえ", answer: "不是" },
+            { word: "名前", answer: "名字" },
+            { word: "友達", answer: "朋友" },
+            { word: "家族", answer: "家人" },
+            { word: "学校", answer: "学校" },
+            { word: "先生", answer: "老师" },
+            { word: "学生", answer: "学生" },
+            { word: "本", answer: "书" },
+            { word: "ペン", answer: "笔" },
+            { word: "机", answer: "桌子" },
+            { word: "椅子", answer: "椅子" },
+            { word: "食べ物", answer: "食物" },
+            { word: "水", answer: "水" },
+            { word: "コーヒー", answer: "咖啡" },
+            { word: "お茶", answer: "茶" },
+            { word: "猫", answer: "猫" },
+            { word: "犬", answer: "狗" }
+        ];
+        
+        // 文字エンコーディングの検出関数
+        function detectEncoding(buffer) {
+            // BOMのチェック
+            const view = new Uint8Array(buffer.slice(0, 4));
+            
+            // UTF-8 BOM: EF BB BF
+            if (view[0] === 0xEF && view[1] === 0xBB && view[2] === 0xBF) {
+                return 'utf-8';
+            }
+            
+            // UTF-16 LE BOM: FF FE
+            if (view[0] === 0xFF && view[1] === 0xFE) {
+                return 'utf-16le';
+            }
+            
+            // UTF-16 BE BOM: FE FF
+            if (view[0] === 0xFE && view[1] === 0xFF) {
+                return 'utf-16be';
+            }
+            
+            // 日本語文字の出現頻度に基づく推測
+            const sampleSize = Math.min(buffer.byteLength, 4096);
+            const sample = new Uint8Array(buffer.slice(0, sampleSize));
+            let sjisScore = 0;
+            let eucjpScore = 0;
+            let utf8Score = 0;
+            
+            for (let i = 0; i < sample.length; i++) {
+                // Shift_JISの文字パターン
+                if (sample[i] >= 0x81 && sample[i] <= 0x9F || sample[i] >= 0xE0 && sample[i] <= 0xFC) {
+                    if (i + 1 < sample.length && (
+                        (sample[i+1] >= 0x40 && sample[i+1] <= 0x7E) || 
+                        (sample[i+1] >= 0x80 && sample[i+1] <= 0xFC)
+                    )) {
+                        sjisScore += 2;
+                    }
+                }
+                
+                // EUC-JPの文字パターン
+                if (sample[i] >= 0xA1 && sample[i] <= 0xFE) {
+                    if (i + 1 < sample.length && sample[i+1] >= 0xA1 && sample[i+1] <= 0xFE) {
+                        eucjpScore += 2;
+                    }
+                }
+                
+                // UTF-8のマルチバイトパターン
+                if ((sample[i] & 0xE0) === 0xC0) { // 2バイト文字
+                    if (i + 1 < sample.length && (sample[i+1] & 0xC0) === 0x80) {
+                        utf8Score += 1;
+                    }
+                } else if ((sample[i] & 0xF0) === 0xE0) { // 3バイト文字
+                    if (i + 2 < sample.length && (sample[i+1] & 0xC0) === 0x80 && (sample[i+2] & 0xC0) === 0x80) {
+                        utf8Score += 2;
+                    }
+                }
+            }
+            
+            // スコアに基づいてエンコーディングを決定
+            if (utf8Score > sjisScore && utf8Score > eucjpScore) {
+                return 'utf-8';
+            } else if (sjisScore > eucjpScore) {
+                return 'shift_jis';
+            } else if (eucjpScore > 0) {
+                return 'euc-jp';
+            }
+            
+            // デフォルトはUTF-8
+            return 'utf-8';
+        }
+        
+        // テキストデコード関数（エンコーディング対応）
+        function decodeText(buffer, encoding) {
+            // 自動検出の場合
+            if (encoding === 'auto') {
+                encoding = detectEncoding(buffer);
+                console.log('検出されたエンコーディング:', encoding);
+            }
+            
+            try {
+                // TextDecoderを使用してデコード
+                const decoder = new TextDecoder(encoding);
+                return decoder.decode(buffer);
+            } catch (error) {
+                console.error('デコードエラー:', error);
+                
+                // フォールバック: Latin1で試す
+                try {
+                    const decoder = new TextDecoder('windows-1252');
+                    return decoder.decode(buffer);
+                } catch (fallbackError) {
+                    // 最終フォールバック: UTF-8
+                    const decoder = new TextDecoder('utf-8');
+                    return decoder.decode(buffer);
+                }
+            }
+        }
+        
+        // ゲームを初期化
+        function initGame() {
+            // タイトルクリック編集を設定
+            document.querySelector('.game-title').addEventListener('blur', function() {
+                if (!this.textContent.trim()) {
+                    this.textContent = '単語消し消し楽';
+                }
+            });
+            
+            // スライダーイベントを設定
+            wordSlider.addEventListener('input', function() {
+                const value = this.value;
+                sliderValue.textContent = `${value} ペア`;
+                
+                // 単語リストがあれば、単語パネルを更新
+                if (wordList.length > 0) {
+                    updateWordPanel(parseInt(value));
+                }
+            });
+            
+            // ファイルインポートイベントを設定
+            wordFileInput.addEventListener('change', handleFileUpload);
+            
+            // エンコーディング選択イベント
+            encodingSelect.addEventListener('change', function() {
+                // ファイルが選択されている場合は、選択したエンコーディングで再解析
+                if (wordFileInput.files.length > 0) {
+                    handleFileUpload({ target: wordFileInput });
+                }
+            });
+            
+            // 初期単語パネルを表示
+            updateWordPanel(parseInt(wordSlider.value));
+            
+            // タイマーを初期化
+            updateTimer();
+        }
+        
+        // ファイルアップロードを処理
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // ファイルタイプをチェック
+            const fileName = file.name.toLowerCase();
+            const isCSV = fileName.endsWith('.csv') || fileName.endsWith('.txt');
+            const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+            
+            // 選択されたエンコーディング
+            const selectedEncoding = encodingSelect.value;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const buffer = e.target.result;
+                    parseWordFile(buffer, isCSV, selectedEncoding, fileName);
+                } catch (error) {
+                    alert('ファイルの解析に失敗しました：' + error.message);
+                    console.error(error);
+                }
+            };
+            
+            // エラーハンドリング
+            reader.onerror = function() {
+                alert('ファイルの読み込みに失敗しました。');
+            };
+            
+            // バイナリデータとして読み込む
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // 単語ファイルを解析
+        function parseWordFile(buffer, isCSV, encoding, fileName) {
+            // テキストをデコード
+            let textContent;
+            
+            if (isCSV) {
+                // CSV/TXTファイル: 指定されたエンコーディングでデコード
+                textContent = decodeText(buffer, encoding);
+            } else {
+                // Excelファイルの場合、簡易的な処理
+                // 実際のExcelファイルはバイナリ形式なので、CSVに変換することをお勧めします
+                alert('Excelファイルは完全にはサポートされていません。CSV形式に変換してからアップロードすることをお勧めします。');
+                
+                // 簡易的なテキスト抽出を試みる
+                try {
+                    textContent = decodeText(buffer, encoding);
+                } catch (error) {
+                    alert('Excelファイルの読み込みに失敗しました。CSV形式に変換してください。');
+                    return;
+                }
+            }
+            
+            // 行に分割
+            const lines = textContent.split(/\r\n|\n|\r/);
+            wordList = [];
+            
+            // 使用されている区切り文字を検出
+            let delimiter = ',';
+            const firstLine = lines[0];
+            
+            // タブ区切りのチェック
+            if (firstLine.indexOf('\t') > -1 && firstLine.indexOf(',') === -1) {
+                delimiter = '\t';
+            }
+            // セミコロン区切りのチェック（欧州形式）
+            else if (firstLine.indexOf(';') > -1 && firstLine.indexOf(',') === -1) {
+                delimiter = ';';
+            }
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line || line.startsWith('#')) continue; // 空行やコメント行をスキップ
+                
+                // 引用符で囲まれた値を考慮した分割
+                let parts = [];
+                let currentPart = '';
+                let inQuotes = false;
+                let quoteChar = '"';
+                
+                // 引用符の種類を検出
+                if (line.indexOf("'") > -1 && line.indexOf('"') === -1) {
+                    quoteChar = "'";
+                }
+                
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    
+                    if (char === quoteChar && (j === 0 || line[j-1] !== '\\')) {
+                        inQuotes = !inQuotes;
+                    } else if (char === delimiter && !inQuotes) {
+                        parts.push(currentPart.trim());
+                        currentPart = '';
+                    } else {
+                        currentPart += char;
+                    }
+                }
+                
+                // 最後の部分を追加
+                parts.push(currentPart.trim());
+                
+                // 引用符を削除
+                parts = parts.map(part => {
+                    if ((part.startsWith('"') && part.endsWith('"')) || 
+                        (part.startsWith("'") && part.endsWith("'"))) {
+                        return part.substring(1, part.length - 1);
+                    }
+                    return part;
+                });
+                
+                // 少なくとも2つの列があることを確認
+                if (parts.length >= 2) {
+                    const word = parts[0].trim();
+                    const answer = parts[1].trim();
+                    
+                    if (word && answer) {
+                        wordList.push({ word, answer });
+                    }
+                }
+            }
+            
+            if (wordList.length === 0) {
+                alert('有効な単語データが見つかりませんでした！ファイル形式が正しいことを確認してください：第1列は日本語単語、第2列は対応する答え。\n\nまた、文字エンコーディングが正しく選択されているか確認してください。');
+                return;
+            }
+            
+            // 結果を表示
+            const sampleWords = wordList.slice(0, 3).map(item => `${item.word} → ${item.answer}`).join(', ');
+            wordCountDisplay.textContent = `${wordList.length} 個の単語をインポートしました (例: ${sampleWords}...)`;
+            gameStatus.textContent = `${wordList.length} 個の単語をインポートしました。スライダーでゲームの単語数を調整してください。`;
+            
+            // 単語パネルを更新
+            updateWordPanel(parseInt(wordSlider.value));
+        }
+        
+        // 単語パネルを更新
+        function updateWordPanel(pairCount) {
+            // 単語リストがない場合はデフォルトの日本語単語を使用
+            if (wordList.length === 0) {
+                showDefaultWords(pairCount);
+                return;
+            }
+            
+            // 単語リストの数を超えないように調整
+            const actualCount = Math.min(pairCount, Math.floor(wordList.length));
+            sliderValue.textContent = `${actualCount} ペア`;
+            wordSlider.value = actualCount;
+            
+            // 単語リストからランダムに選択
+            const shuffled = [...wordList].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, actualCount);
+            
+            // 単語ペアを作成（各単語は2回出現：1回は単語、1回は答え）
+            const wordPairs = [];
+            selected.forEach(item => {
+                wordPairs.push({
+                    type: 'word',
+                    content: item.word,
+                    match: item.answer,
+                    id: Math.random().toString(36).substr(2, 9)
+                });
+                
+                wordPairs.push({
+                    type: 'answer',
+                    content: item.answer,
+                    match: item.word,
+                    id: Math.random().toString(36).substr(2, 9)
+                });
+            });
+            
+            // 順序をシャッフル
+            currentWords = wordPairs.sort(() => Math.random() - 0.5);
+            totalPairs = actualCount;
+            matchedPairs = 0;
+            
+            // 単語カードをレンダリング
+            renderWordCards();
+        }
+        
+        // デフォルトの単語を表示
+        function showDefaultWords(pairCount) {
+            // デフォルト単語の数を超えないように調整
+            const actualCount = Math.min(pairCount, defaultJapaneseWords.length);
+            sliderValue.textContent = `${actualCount} ペア`;
+            wordSlider.value = actualCount;
+            
+            // デフォルト単語から選択
+            const shuffled = [...defaultJapaneseWords].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, actualCount);
+            
+            // 単語ペアを作成
+            const wordPairs = [];
+            selected.forEach(item => {
+                wordPairs.push({
+                    type: 'word',
+                    content: item.word,
+                    match: item.answer,
+                    id: Math.random().toString(36).substr(2, 9)
+                });
+                
+                wordPairs.push({
+                    type: 'answer',
+                    content: item.answer,
+                    match: item.word,
+                    id: Math.random().toString(36).substr(2, 9)
+                });
+            });
+            
+            // 順序をシャッフル
+            currentWords = wordPairs.sort(() => Math.random() - 0.5);
+            totalPairs = actualCount;
+            matchedPairs = 0;
+            
+            // 単語カードをレンダリング
+            renderWordCards();
+            
+            wordCountDisplay.textContent = `デフォルトの日本語単語を使用中 (${defaultJapaneseWords.length}個)`;
+            gameStatus.textContent = 'デフォルトの日本語単語を使用しています。独自の単語リストを使用するには、単語リストをインポートしてください。';
+        }
+        
+        // 単語カードをレンダリング
+        function renderWordCards() {
+            wordsPanel.innerHTML = '';
+            
+            currentWords.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'word-card';
+                card.dataset.id = item.id;
+                card.dataset.match = item.match;
+                card.dataset.type = item.type;
+                card.dataset.content = item.content;
+                
+                const wordDiv = document.createElement('div');
+                wordDiv.className = 'word';
+                
+                // 日本語の単語かどうかをチェック
+                const isJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(item.content);
+                if (isJapanese && item.type === 'word') {
+                    wordDiv.classList.add('japanese-word');
+                }
+                
+                wordDiv.textContent = item.content;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer';
+                answerDiv.textContent = item.type === 'word' ? '日本語単語' : '答え';
+                
+                const typeDiv = document.createElement('div');
+                typeDiv.className = 'card-type';
+                typeDiv.textContent = item.type === 'word' ? '単語' : '答え';
+                
+                card.appendChild(wordDiv);
+                card.appendChild(answerDiv);
+                card.appendChild(typeDiv);
+                
+                // クリックイベントを追加
+                card.addEventListener('click', () => handleCardClick(card));
+                
+                wordsPanel.appendChild(card);
+            });
+            
+            // ゲーム状態をリセット
+            selectedCard = null;
+            gameStarted = false;
+            seconds = 0;
+            timeDisplay.textContent = '0';
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+            
+            // ゲームステータスを更新
+            if (totalPairs > 0) {
+                gameStatus.textContent = `ゲームの準備ができました！${totalPairs} ペアの単語をマッチさせてください。カードをクリックしてゲームを開始します。`;
+            }
+        }
+        
+        // カードクリックを処理
+        function handleCardClick(card) {
+            // すでにマッチしたカードは無視
+            if (card.classList.contains('matched')) return;
+            
+            // すでにカードが選択されている場合
+            if (selectedCard) {
+                // 同じカードをクリックした場合は無視
+                if (selectedCard === card) return;
+                
+                // マッチをチェック
+                const card1Type = selectedCard.dataset.type;
+                const card1Content = selectedCard.dataset.content;
+                const card1Match = selectedCard.dataset.match;
+                
+                const card2Type = card.dataset.type;
+                const card2Content = card.dataset.content;
+                const card2Match = card.dataset.match;
+                
+                // マッチ成功
+                if ((card1Type !== card2Type) && 
+                    ((card1Content === card2Match && card2Content === card1Match) || 
+                     (card1Content === card2Content && card1Match === card2Match))) {
+                    
+                    // マッチとしてマーク
+                    selectedCard.classList.add('matched');
+                    card.classList.add('matched');
+                    
+                    matchedPairs++;
+                    
+                    // ゲームが完了したかチェック
+                    if (matchedPairs === totalPairs) {
+                        gameStatus.textContent = `おめでとうございます！${totalPairs} ペアの単語をすべてマッチさせました！経過時間：${seconds} 秒。`;
+                        if (gameTimer) {
+                            clearInterval(gameTimer);
+                            gameTimer = null;
+                        }
+                    } else {
+                        gameStatus.textContent = `マッチ成功！${matchedPairs}/${totalPairs} ペアをマッチさせました。`;
+                    }
+                    
+                    selectedCard = null;
+                } else {
+                    // マッチしない場合
+                    card.style.backgroundColor = '#ffe6e6';
+                    selectedCard.style.backgroundColor = '#ffe6e6';
+                    
+                    gameStatus.textContent = 'マッチしませんでした。もう一度試してください！';
+                    
+                    // 1秒後に状態をリセット
+                    setTimeout(() => {
+                        card.style.backgroundColor = '';
+                        selectedCard.style.backgroundColor = '';
+                        selectedCard = null;
+                        
+                        if (matchedPairs < totalPairs) {
+                            gameStatus.textContent = `${matchedPairs}/${totalPairs} ペアをマッチさせました。カードをクリックして続けてください。`;
+                        }
+                    }, 1000);
+                }
+            } else {
+                // 最初のカード選択、ゲームタイマーを開始
+                if (!gameStarted) {
+                    startGameTimer();
+                    gameStarted = true;
+                    gameStatus.textContent = `ゲームスタート！${matchedPairs}/${totalPairs} ペアをマッチさせました。`;
+                }
+                
+                // カードを選択
+                selectedCard = card;
+                card.style.backgroundColor = '#e6f7ff';
+                gameStatus.textContent = `${card.dataset.type === 'word' ? '日本語単語' : '答え'}を選択しました。対応する${card.dataset.type === 'word' ? '答え' : '日本語単語'}を選んでください。`;
+            }
+        }
+        
+        // ゲームタイマーを開始
+        function startGameTimer() {
+            seconds = 0;
+            timeDisplay.textContent = '0';
+            
+            gameTimer = setInterval(() => {
+                seconds++;
+                timeDisplay.textContent = seconds;
+            }, 1000);
+        }
+        
+        // タイマー表示を更新
+        function updateTimer() {
+            // startGameTimerで実装済み
+        }
+        
+        // ページが読み込まれたらゲームを初期化
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
